@@ -1,0 +1,25 @@
+{
+    "name": "kuzuha/multimeter",
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.4",
+        "phpunit/phpunit": ">=3.7,<3.8"
+    },
+    "require-dev": {
+        "phing/phing": ">=2.6",
+        "instaclick/php-code-sniffer": ">=1.4",
+        "phpmd/phpmd": ">=1.5",
+        "sebastian/phpcpd": ">=1.4",
+        "apigen/apigen": ">=2.8"
+    },
+    "license": "BSD-2-Clause",
+    "authors": [
+        {
+            "name": "Kuzuha SHINODA",
+            "email": "kuzuha01@hotmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": { "Multimeter\\": "php/classes/" }
+    }
+}
