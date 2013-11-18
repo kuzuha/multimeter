@@ -18,7 +18,7 @@ class AggregatorTest extends \PHPUnit_Framework_TestCase
         $this->aggregator
             ->assertSame(1, 1)
             ->assertNotNull(100)
-            ->evaluate();
+            ->evaluate('success');
     }
 
     /**

@@ -126,9 +126,6 @@ class Aggregator
     public function evaluate($message = '')
     {
         $messageList = [];
-        if ($message) {
-            $messageList[] = $message;
-        }
 
         foreach ($this->assertionList as $assertion) {
             list($method, $params) = $assertion;
@@ -136,12 +133,12 @@ class Aggregator
             try {
                 call_user_func_array([self::ASSERT_CLASS_NAME, $method], $params);
             } catch (PHPUnit_Framework_ExpectationFailedException $exception) {
-                $message = $exception->toString();
+                $str = $exception->toString();
                 $failure = $exception->getComparisonFailure();
                 if ($failure) {
-                    $message .= "\n" . $failure->getDiff();
+                    $str .= "\n" . $failure->getDiff();
                 }
-                $messageList[] = $message;
+                $messageList[] = $str;
             } catch (PHPUnit_Framework_AssertionFailedError $exception) {
                 $messageList[] = $exception->toString();
             } catch (Exception $exception) {
@@ -150,6 +147,9 @@ class Aggregator
         }
 
         if ($messageList) {
+            if ($message) {
+                array_unshift($messageList, $message);
+            }
             throw new PHPUnit_Framework_AssertionFailedError(implode("\n\n", $messageList));
         }
     }
