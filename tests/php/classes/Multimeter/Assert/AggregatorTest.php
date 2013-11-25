@@ -9,10 +9,11 @@ class AggregatorTest extends \PHPUnit_Framework_TestCase
      */
     public $aggregator;
 
-    public function setUp(){
+    public function setUp()
+    {
         $this->aggregator = new Aggregator($this);
     }
-    
+
     public function testSuccess()
     {
         $this->aggregator

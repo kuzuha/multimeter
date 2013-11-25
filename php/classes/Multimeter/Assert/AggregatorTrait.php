@@ -9,6 +9,6 @@ trait AggregatorTrait
      */
     public static function aggregator()
     {
-        return new Aggregator();
+        return new Aggregator(__CLASS__);
     }
 }

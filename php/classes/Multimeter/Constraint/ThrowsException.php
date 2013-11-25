@@ -5,17 +5,14 @@ namespace Multimeter\Constraint;
 use Exception;
 use InvalidArgumentException;
 use PHPUnit_Framework_Constraint;
-use PHPUnit_Framework_Constraint_And;
-use PHPUnit_Framework_Constraint_Exception;
-use PHPUnit_Framework_Constraint_ExceptionCode;
-use PHPUnit_Framework_Constraint_ExceptionMessage;
 
 class ThrowsException extends PHPUnit_Framework_Constraint
 {
     /**
      * @var \PHPUnit_Framework_Constraint
      */
-    protected $constraint;
+    protected $constraint = null;
+    protected $expectedException = [];
 
     /**
      * @param string|array $expectedException
@@ -24,32 +21,28 @@ class ThrowsException extends PHPUnit_Framework_Constraint
      */
     public function __construct($expectedException)
     {
-        if (is_string($expectedException)) {
+        if (empty($expectedException)) {
+            
+        } if (is_string($expectedException)) {
             $expectedException = ['class' => $expectedException];
         } else if (!is_array($expectedException)) {
             throw new InvalidArgumentException('Argument must be string or array.');
         }
 
-        $constraintList = [];
-
         if (isset($expectedException['class'])) {
-            $constraintList[] = new PHPUnit_Framework_Constraint_Exception($expectedException['class']);
+            $this->expectedException['class'] = $expectedException['class'];
         }
 
         if (isset($expectedException['message'])) {
-            $constraintList[] = new PHPUnit_Framework_Constraint_ExceptionMessage($expectedException['message']);
+            $this->expectedException['message'] = $expectedException['message'];
         }
 
         if (isset($expectedException['code'])) {
-            $constraintList[] = new PHPUnit_Framework_Constraint_ExceptionCode($expectedException['code']);
+            $this->expectedException['code'] = $expectedException['code'];
         }
-
-        if (empty($constraintList)) {
-            throw new InvalidArgumentException('Can\'t find any constraints.');
-        }
-
-        $this->constraint = new PHPUnit_Framework_Constraint_And();
-        $this->constraint->setConstraints($constraintList);
+        ksort($this->expectedException);
+        
+        $this->constraint = new \PHPUnit_Framework_Constraint_IsEqual($this->expectedException);
     }
 
     public function evaluate($other, $description = '', $returnResult = false)
@@ -58,14 +51,31 @@ class ThrowsException extends PHPUnit_Framework_Constraint
             /** @var $other callable */
             $other();
         } catch (Exception $exception) {
-            return $this->constraint->evaluate($exception, $description, $returnResult);
+            $error = [];
+            if (empty($this->expectedException) || isset($this->expectedException['class'])) {
+                $error['class'] = get_class($exception);
+            }
+            if (empty($this->expectedException) || isset($this->expectedException['code'])) {
+                $error['code'] = $exception->getCode();
+            }
+            if (empty($this->expectedException) || isset($this->expectedException['message'])) {
+                $error['message'] = $exception->getMessage();
+            }
+            ksort($error);
+            return $this->constraint->evaluate($error, $description, $returnResult);
+        }
+
+        if ($this->expectedException) {
+            if ($returnResult) {
+                return false;
+            }
+
+            $this->fail($other, $description);
         }
 
         if ($returnResult) {
-            return false;
+            return true;
         }
-
-        $this->fail($other, $description);
     }
 
     /**
@@ -75,6 +85,10 @@ class ThrowsException extends PHPUnit_Framework_Constraint
      */
     public function toString()
     {
-        return $this->constraint->toString();
+        if ($this->expectedException) {
+            return $this->constraint->toString();
+        }
+
+        return "doesn't throws Exception";
     }
 }

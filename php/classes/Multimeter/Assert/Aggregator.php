@@ -106,12 +106,16 @@ use PHPUnit_Framework_ExpectationFailedException;
  */
 class Aggregator
 {
-    const ASSERT_CLASS_NAME = '\\PHPUnit_Framework_Assert';
-
+    protected $assertClassName;
     /**
      * @var array
      */
     protected $assertionList = array();
+
+    public function __construct($assertClassName = '\\PHPUnit_Framework_Assert')
+    {
+        $this->assertClassName = $assertClassName;
+    }
 
     public function __call($method, array $params)
     {
@@ -131,9 +135,9 @@ class Aggregator
             list($method, $params) = $assertion;
 
             try {
-                call_user_func_array([self::ASSERT_CLASS_NAME, $method], $params);
+                call_user_func_array([$this->assertClassName, $method], $params);
             } catch (PHPUnit_Framework_ExpectationFailedException $exception) {
-                $str = $exception->toString();
+                $str     = $exception->toString();
                 $failure = $exception->getComparisonFailure();
                 if ($failure) {
                     $str .= "\n" . $failure->getDiff();

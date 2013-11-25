@@ -16,7 +16,13 @@ class ThrowsExceptionTest extends \PHPUnit_Framework_TestCase
 
     public function testToString()
     {
-        $expected  = 'exception of type "DomainException" and exception message contains  and exception code is ';
+        $this->assertSame("doesn't throws Exception", (new ThrowsException([]))->toString());
+
+        $expected  = "is equal to Array (
+    'class' => 'DomainException'
+    'code' => 100
+    'message' => 'foo bar'
+)";
         $exception = ['class' => 'DomainException', 'message' => 'foo bar', 'code' => 100];
         $actual    = (new ThrowsException($exception))->toString();
         $this->assertSame($expected, $actual);
@@ -24,11 +30,11 @@ class ThrowsExceptionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Can't find any constraints.
+     * @expectedExceptionMessage Argument must be string or array.
      */
     public function testInvalidArguments()
     {
-        new ThrowsException([]);
+        new ThrowsException(true);
     }
 
     public function evaluateDataProvider()
@@ -37,7 +43,11 @@ class ThrowsExceptionTest extends \PHPUnit_Framework_TestCase
             throw new DomainException('foo bar', 100);
         };
 
+        $noException = function () {
+        };
+
         return [
+            [true, $noException, [], 'no exception'],
             [true, $callback, 'DomainException', 'valid string'],
             [false, $callback, 'BadFunctionCallException', 'invalid string'],
             [true, $callback, ['class' => 'DomainException', 'message' => 'foo bar', 'code' => 100], 'valid array'],
