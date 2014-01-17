@@ -10,6 +10,8 @@ class AggregatorTraitTest extends \PHPUnit_Framework_TestCase
     {
         $aggregator = $this->aggregator();
         $this->assertInstanceOf(__NAMESPACE__ . '\\Aggregator', $aggregator);
-        $this->assertNotSame($aggregator, $this->aggregator());
+        $this->assertNotSame($aggregator, $other = $this->aggregator());
+        $aggregator->evaluate();
+        $other->evaluate();
     }
 }

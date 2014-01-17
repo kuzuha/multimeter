@@ -112,6 +112,8 @@ class Aggregator
      */
     protected $assertionList = array();
 
+    protected $exit = false;
+
     public function __construct($assertClassName = '\\PHPUnit_Framework_Assert')
     {
         $this->assertClassName = $assertClassName;
@@ -120,6 +122,7 @@ class Aggregator
     public function __call($method, array $params)
     {
         if (!preg_match('/^assert.+/', $method)) {
+            $this->exit = true;
             throw new BadMethodCallException(sprintf('%s is not a valid assertion method.', $method));
         }
         $this->assertionList[] = [$method, $params];
@@ -127,8 +130,16 @@ class Aggregator
         return $this;
     }
 
+    public function __destruct()
+    {
+        if (!$this->exit) {
+            trigger_error("Aggreagtor destructed without safe exit");
+        }
+    }
+
     public function evaluate($message = '')
     {
+        $this->exit = true;
         $messageList = [];
 
         foreach ($this->assertionList as $assertion) {
