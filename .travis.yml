@@ -1,0 +1,11 @@
+language: php
+php:
+    - 5.4
+    - 5.5
+    - hhvm
+before_script:
+    - composer install
+    - sh -c 'if [ $(php -r "echo (int) defined('HHVM_VERSION');") -eq 0 ]; then echo "" >> "~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini"; fi;'
+    - sh -c 'if [ $(php -r "echo (int) defined('HHVM_VERSION');") -eq 0 ]; then echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
+script:
+    - vendor/bin/phpunit tests
