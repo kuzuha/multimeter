@@ -3,6 +3,9 @@ php:
     - 5.4
     - 5.5
     - hhvm
+matrix:
+    allow_failures:
+        - php: hhvm
 before_script:
     - composer install
     - sh -c 'if [ $(php -r "echo (int) defined('HHVM_VERSION');") -eq 0 ]; then echo "" >> "~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini"; fi;'
