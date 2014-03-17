@@ -18,14 +18,14 @@ class ThrowsExceptionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame("doesn't throws Exception", (new ThrowsException([]))->toString());
 
-        $expected  = "is equal to Array (
+        $expected  = "/\\Ais equal to Array (&0 )?\\(
     'class' => 'DomainException'
     'code' => 100
     'message' => 'foo bar'
-)";
+\\)\\z/";
         $exception = ['class' => 'DomainException', 'message' => 'foo bar', 'code' => 100];
         $actual    = (new ThrowsException($exception))->toString();
-        $this->assertSame($expected, $actual);
+        $this->assertRegExp($expected, $actual);
     }
 
     /**
