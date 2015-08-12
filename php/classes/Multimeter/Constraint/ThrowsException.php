@@ -21,6 +21,7 @@ class ThrowsException extends PHPUnit_Framework_Constraint
      */
     public function __construct($expectedException)
     {
+        parent::__construct();
         if (empty($expectedException)) {
             
         } if (is_string($expectedException)) {
